@@ -1,0 +1,45 @@
+@import "normalize";
+@import "skeleton";
+
+body{
+  min-width: 2000px;
+  padding: 10px;
+  overflow-x: visible;
+}
+
+h1{
+  font-size: 2em;
+}
+h4{
+  font-size: 1.5em;
+}
+
+.art-board svg{
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+.controls{
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 400px;
+  padding: 10px;
+  background-color: rgba(0,0,0,0.05);
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+label.is-inline{
+  display: inline-block;
+}
+
+.canvas-size input{
+  width: 80px;
+}
+
+legend{
+  font-size: 1.1em;
+}
+
+.colorset{
+  width: 90%;
+}

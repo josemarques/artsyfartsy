@@ -1,0 +1,152 @@
+<!doctype html>
+<html class="no-js" lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link href='//fonts.googleapis.com/css?family=Raleway:400,300,600' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href="css/main.css">
+
+        <script src="js/vendor/modernizr-2.8.3.min.js"></script>
+    </head>
+    <body>
+        <div class="">
+          <h1>artsy/fartsy</h1>
+          <div class="row">
+            <section class="art-board column" id="art-board"></section>
+            <section class="controls column">
+              <h4>Controls</h4>
+              <fieldset>
+                <legend>Canvas</legend>
+                <div class="row canvas-size">
+                  <div class="six columns">
+                    <label for="deviceType">Device</label>
+                    <select id="deviceType">
+                      <option value="iphone5">iPhone 5</option>
+                      <option value="iphone6">iPhone 6</option>
+                      <option value="iiphone6s" >iPhone 6S</option>
+                      <option value="nexus5" selected>Nexus 5</option>
+                      <option value="nexus6">Nexus 6</option>
+                      <option value="ipad">iPad</option>
+                      <option value="nexus6">Nexus 7</option>
+                      <option value="pixel">Pixel 10</option>
+                      <option value="macbook13">MacBook 13inch</option>
+                      <option value="macbook15">MacBook 15inch</option>
+                      <option value="macbook73">MacBook 17inch</option>
+                      <option value="thunder">Thunderbold display</option>
+                      <option value="generic">Generic laptop</option>
+                      <option value="custom" selected>Custom</option>
+                    </select>
+                  </div>
+                  <div class="six columns">
+                    <label for="numberShapes">Dimention</label>
+                    <input type="number" size=4 id="maxWidth" value=320 /> x
+                    <input type="number" size=4 id="maxHeight" value=568 />
+                  </div>
+                </div>
+              </fieldset>
+              <fieldset>
+                <legend>Shapes</legend>
+                <div class="row">
+                  <div class="six columns">
+                    <label for="numberShapes">Number</label>
+                    <input type="number" min=1 max=1000 id="numberShapes" value=100 />
+                  </div>
+                  <div class="six columns">
+                    <label for="objectSize">Size</label>
+                    <select id="objectSize">
+                      <option value="xl">Extra large</option>
+                      <option value="l">Large</option>
+                      <option value="m" >Medium</option>
+                      <option value="s" selected>Small</option>
+                      <option value="xs">Extra small</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="six columns">
+                    <label>Allowed Shapes</label>
+                    <input type="checkbox" id="allowedShapes" value="rectangle"  checked />
+                    <label class="is-inline" for="" >Rectangles</label>
+                  <br/>
+                    <input type="checkbox" id="allowedShapes" value="circle"   />
+                    <label class="is-inline" for="" >Circles</label>
+                  <br/>
+                    <input type="checkbox" id="allowedShapes" value="triangle"   />
+                    <label class="is-inline" for="" >Triangles</label>
+                  <br/>
+                    <input type="checkbox" id="allowedShapes" value="polygon"   />
+                    <label class="is-inline" for="" >Polygon</label>
+                  <br/>
+                    <input type="checkbox" id="allowedShapes" value="line" checked  />
+                    <label class="is-inline" for="" >Lines</label>
+                  </div>
+                  <div class="six columns">
+                    <label>Transformations</label>
+                    <input type="checkbox" id="allowRotation" checked />
+                    <label class="is-inline" for="allowRotation">Rotation</label>
+                    <br/>
+                    <input type="checkbox" id="persistentAngle" checked />
+                    <label class="is-inline" for="persistentAngle">Persisten angle</label>
+                    <br/>
+                    <input type="checkbox" id="allowPerpendicular" checked />
+                    <label class="is-inline" for="allowPerpendicular">Perpendicular lines</label>
+                    <br/>
+                    <input type="checkbox" id="allowRoundCorners" />
+                    <label class="is-inline" for="allowRoundCorners">Rounded corners</label>
+                  </div>
+                </div>
+              </fieldset>
+
+
+              <fieldset>
+                <legend>Color</legend>
+                <div class="row">
+                  <div class="six columns">
+                    <label for="numberColors">Number of colors</label>
+                    <input type="number" min=1 max=100 id="numberColors" value=10 />
+
+                  </div>
+                  <div class="six columns">
+                    <input type="checkbox" id="useBackgroundColor" />
+                    <label class="is-inline"  for="backgroundColor">Background Color</label>
+                    <input type="color" id="backgroundColor" value="ffffff"  />
+
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="six columns">
+                    <input type="checkbox" id="allowTransparency" checked />
+                    <label class="is-inline" for="allowTransparency">Allow Transparency</label>
+                  </div>
+                  <div class="six columns">
+                    <input type="checkbox" id="useColorSet" />
+                    <label class="is-inline" for="useColorSet">Color set</label>
+                    <textarea class="colorset" id="colorSet" ></textarea>
+                  </div>
+                </div>
+
+              </fieldset>
+
+              <div class="row">
+                <input class="button-primary" type="submit" value="Generate" id="generate" />
+              </div>
+              <hr/>
+              <div class="row">
+                <input class="button-primary" type="submit" value="Save SVG" id="save"/>
+                <input class="button-primary" type="submit" value="Download JPG" id="download"/>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.11.2.min.js"><\/script>')</script>
+
+        <script src="js/vendor/raphael.min.js"></script>
+        <script src="js/main.min.js"></script>
+    </body>
+</html>
