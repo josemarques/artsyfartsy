@@ -2,7 +2,6 @@
 @import "skeleton";
 
 body{
-  min-width: 2000px;
   padding: 10px;
   overflow-x: visible;
 }
@@ -19,12 +18,12 @@ h4{
 }
 
 .controls{
-  position: absolute;
+  position: fixed;
   top: 10px;
   right: 10px;
   width: 400px;
   padding: 10px;
-  background-color: rgba(0,0,0,0.05);
+  background-color: rgba(255,255,255,0.95);
   border: 1px solid rgba(0,0,0,0.05);
 }
 
@@ -42,4 +41,52 @@ legend{
 
 .colorset{
   width: 90%;
+}
+
+.actionable{
+  display: inline-block !important;
+}
+
+.hidden{
+  display: none;
+}
+
+.button,
+button,
+input[type="submit"],
+input[type="reset"],
+input[type="button"] {
+  height: auto;
+  padding: 0.1em 1em;
+  color: #555;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .1rem;
+  line-height: 2.5;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  background-color: transparent;
+  border-radius: 4px;
+  border: 1px solid #bbb;
+  cursor: pointer;
+  box-sizing: border-box; }
+
+
+.button.is-small{
+  font-size: 0.5em;
+}
+
+input[type="email"],
+input[type="number"],
+input[type="search"],
+input[type="text"],
+input[type="tel"],
+input[type="url"],
+input[type="password"],
+textarea,
+select {
+  height: 30px;
+  padding: 3px 10px; /* The 6px vertically centers text on FF, ignored by Webkit */
 }

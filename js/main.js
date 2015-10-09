@@ -1,53 +1,55 @@
+
+
 /* Declare all the global things */
 var maxArtboardPosX = 800;
 var maxArtboardPosY = 600;
-var paper, preferences, globalAngle;
+var paper, preferences, globalAngle, retina = 1;
 
-$(document).ready(function(){
+$( document ).ready( function(){
 
 	//create paper
-	paper = Raphael("art-board", maxArtboardPosX,maxArtboardPosY);
+	paper = Raphael( "art-board", maxArtboardPosX,maxArtboardPosY );
 
-	$("#generate").on("click", function () {
+	$( "#generate" ).on( "click", function () {
 		preferences = getPreferences();
 		resizeArtboard (preferences.maxWidth, preferences.maxHeight);
 		generateShapes( preferences.numberShapes );
 		return false;
 	});
 
-	$("#save").on("click", function (){
-		var svgString = document.getElementById('art-board').innerHTML;
-		a = document.createElement('a');
-		a.download = 'mySvg.svg';
-		a.type = 'image/svg+xml';
-		blob = new Blob([svgString], {"type": "image/svg+xml"});
-		a.href = (window.URL || webkitURL).createObjectURL(blob);
-		a.click();
+	$( "#save" ).on( "click", function (){
+		savedSVG();
 	});
+
+	$( "#download" ).on( "click", function (){
+		downloadJPG();
+	});
+
+	$( "#addColor" ).on( "click", function (){
+		var selectedColors = $( "#colorSet" ).val();
+		if ( selectedColors != '' )
+			$( "#colorSet" ).val( selectedColors + "," + $( "#colorChooser" ).val() );
+		else{
+			$( "#colorSet" ).val( $( "#colorChooser" ).val() );
+		}
+	});
+
+	$( "#useColorSet, #useBackgroundColor" ).on( "change", function (){
+		showHideNextElement(this);
+	});
+
+	$( "#deviceType" ).on("change", function(){
+		updateCanvasDimention();
+	});
+
+
 });
-
-function resizeArtboard ( width, height ){
-	maxArtboardPosX = width*1.5;
-	maxArtboardPosY = height*1.5
-	paper.setSize(width, height);
-}
-
-function drawBackground (){
-	var opacity = 1;
-	if(preferences.allowTransparency)
-		opacity = getRandomArbitrary(0.1, 1);
-	var background = paper.rect(0,0,preferences.maxWidth,preferences.maxHeight).attr({
-		fill: getColor(),
-		'stroke-width': 0,
-		'fill-opacity': opacity
-	});
-
-}
 
 function getPreferences () {
 	var preferences = {};
-	preferences.maxWidth = $("#maxWidth").val();
-	preferences.maxHeight = $("#maxHeight").val();
+	preferences.retina = $("#retinaValue").val();
+	preferences.maxWidth = $("#maxWidth").val() * preferences.retina;
+	preferences.maxHeight = $("#maxHeight").val() * preferences.retina;
 	preferences.numberShapes = $("#numberShapes").val();
 	preferences.numberColors = $("#numberColors").val();
 	preferences.allowRotation = $("#allowRotation").prop('checked');
@@ -56,6 +58,10 @@ function getPreferences () {
 	preferences.allowTransparency = $("#allowTransparency").prop('checked');
 	preferences.allowRoundCorners = $("#allowRoundCorners").prop('checked');
 	preferences.objectSize = $("#objectSize").val();
+	preferences.useBackgroundColor = $("#useBackgroundColor").prop('checked');
+	preferences.backgroundColor = $("#backgroundColor").val();
+	preferences.useColorSet = $("#useColorSet").prop('checked');
+	preferences.colorSet = $("#colorSet").val();
 
 	switch (preferences.objectSize) {
 		case "xl":
@@ -78,8 +84,29 @@ function getPreferences () {
         return $(this).val();
 			}).toArray();
 
-	preferences.allowedColors = generateColorArray ( preferences.numberColors );
+	if ( preferences.useColorSet ){
+		preferences.allowedColors = preferences.colorSet.split(",");
+	}
+	else{
+		preferences.allowedColors = generateColorArray ( preferences.numberColors );
+	}
 	return preferences;
+}
+
+function resizeArtboard ( width, height ){
+	maxArtboardPosX = width;
+	maxArtboardPosY = height;
+	paper.setSize(maxArtboardPosX, maxArtboardPosY);
+}
+
+function drawBackground (){
+	var opacity = 1;
+	var color = ( preferences.useBackgroundColor ? preferences.backgroundColor : getColor());
+	var background = paper.rect(0,0,preferences.maxWidth,preferences.maxHeight).attr({
+		fill: color,
+		'stroke-width': 0
+	});
+
 }
 
 /*
@@ -139,7 +166,7 @@ function drawRectangle () {
 		radius = getRandomArbitrary(0, ( width > height ? width : height ));
 
 	if(preferences.allowTransparency)
-		opacity = getRandomArbitrary(0.1, 1);
+		opacity = getRandomArbitrary(0.25, 1);
 
 	var rectangle = paper.rect(x,y,width,height).attr({
 		fill: getColor(),
@@ -168,7 +195,7 @@ function drawCircle () {
 	var radius = getRandomArbitrary(0,preferences.maxWidth);
 
 	if(preferences.allowTransparency)
-		opacity = getRandomArbitrary(0, 1);
+		opacity = getRandomArbitrary(0.25, 1);
 
 	var circle = paper.circle(x,y,radius).attr({
 		fill: getColor(),
@@ -201,7 +228,7 @@ function drawPolygon (verticesNumber) {
 	}
 
 	if(preferences.allowTransparency)
-		var opacity = getRandomArbitrary(0, 1);
+		var opacity = getRandomArbitrary(0.25, 1);
 
 	var polygon = paper.path(polygonString).attr({
 		fill: getColor(),
@@ -209,7 +236,7 @@ function drawPolygon (verticesNumber) {
 		'fill-opacity': opacity
 	});
 
-	polygon.transform( "s" + preferences.objectSize );
+	polygon.transform( "s" + preferences.objectSize/2 );
 }
 
 function drawTriangle() {
@@ -226,7 +253,7 @@ function drawTriangle() {
 						"L " + parseInt(x1 + side/2) + "," + parseInt(y1 + side/1.5);
 
 	if(preferences.allowTransparency)
-		var opacity = getRandomArbitrary(0, 1);
+		var opacity = getRandomArbitrary(0.25, 1);
 
 	console.log ("triangle: " + triangleString);
 
@@ -284,7 +311,7 @@ function drawLine (){
 	lineString = lineString + " L " + point2;
 
 	if(preferences.allowTransparency)
-		var opacity = getRandomArbitrary(0, 1);
+		var opacity = getRandomArbitrary(0.25, 1);
 
 	var stroke_width = getRandomArbitrary(1, 3);
 
@@ -316,4 +343,71 @@ function generateColorArray ( numberColors ) {
 function getColor () {
 	var color = preferences.allowedColors[Math.floor(Math.random() * preferences.allowedColors.length)];
 	return color;
+}
+
+function saveSVG () {
+	var svgString = document.getElementById('art-board').innerHTML;
+	a = document.createElement('a');
+	a.download = 'artsyfartsiness.svg';
+	a.type = 'image/svg+xml';
+	blob = new Blob([svgString], {"type": "image/svg+xml"});
+	a.href = (window.URL || webkitURL).createObjectURL(blob);
+	a.click();
+}
+
+function downloadJPG () {
+	alert("someday");
+}
+
+function showHideNextElement ( culprid ) {
+	$( "#" + ($( culprid ).attr("data-toggles") ) ) .toggleClass('actionable');
+}
+
+function updateCanvasDimention () {
+	var selectedCanvas = $( "#deviceType" ).val();
+
+	switch (selectedCanvas) {
+		case 'iphone5':
+			setCanvasUI (320,568,2);
+			break;
+
+		case 'iphone6':
+			setCanvasUI (375,627,2);
+			break;
+
+		case 'iphone6p':
+			setCanvasUI (414,736,2);
+			break;
+
+		case 'nexus5':
+			setCanvasUI (360,567,3);
+			break;
+		case 'nexus6':
+			setCanvasUI (412,659,3.5);
+			break;
+		case 'nexus7':
+			setCanvasUI (600,950,2);
+			break;
+		case 'ipad':
+			setCanvasUI (768,1024,2);
+			break;
+		case 'macbook':
+			setCanvasUI (1440,900,2);
+			break;
+		case 'thunder':
+			setCanvasUI (2560,1440,1);
+			break;
+		case 'generic':
+			setCanvasUI (1440,900,1);
+			break;
+		default:
+			setCanvasUI (600,600,1);
+			break;
+	}
+}
+
+function setCanvasUI (width,height,retinaValue) {
+	$( "#maxWidth").val(width);
+	$( "#maxHeight").val(height);
+	$( "#retinaValue").val(retinaValue);
 }
