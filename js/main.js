@@ -18,7 +18,7 @@ $( document ).ready( function(){
 	});
 
 	$( "#save" ).on( "click", function (){
-		savedSVG();
+		saveSVG();
 	});
 
 	$( "#download" ).on( "click", function (){
@@ -336,7 +336,6 @@ function generateColorArray ( numberColors ) {
 	for (k = 0; k < numberColors; k++) {
 		colors[k] = getRandomColor ();
 	}
-	console.log(colors);
 	return colors;
 }
 
@@ -356,8 +355,10 @@ function saveSVG () {
 }
 
 function downloadJPG () {
-	alert("someday");
+	var svgNode = document.getElementById("art-board").childNodes[0];
+  saveSvgAsPng(svgNode, "diagram.png");
 }
+
 
 function showHideNextElement ( culprid ) {
 	$( "#" + ($( culprid ).attr("data-toggles") ) ) .toggleClass('actionable');
