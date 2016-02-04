@@ -59,7 +59,9 @@
                   <option value="m" >Medium</option>
                   <option value="s" selected>Small</option>
                   <option value="xs">Extra small</option>
-                </select>
+                </select><br/>
+                <input type="checkbox" id="allowOutliers" checked />
+                <label class="is-inline" for="allowOutliers" >Allow outliers</label>
               </div>
             </div>
             <div class="row">
@@ -90,10 +92,20 @@
                 <br/>
                 <input type="checkbox" id="allowPerpendicular" checked />
                 <label class="is-inline" for="allowPerpendicular">Perpendicular lines</label>
+                <label>Filling</label>
+                <select id="fillingtype">
+                  <option value="solid">Solid</option>
+                  <option value="random" selected>Randomize</option>
+                  <option value="none">No filling</option>
+                </select>
+                <label class="is-inline" for="allowSolid">Solid</label>
+                <br/>
+                <input type="checkbox" id="allowDistict"  />
+                <label class="is-inline" for="allowDistict">Allow distinct colors</label>
+
               </div>
             </div>
           </fieldset>
-
 
           <fieldset>
             <legend>Color</legend>
@@ -132,7 +144,7 @@
           <hr/>
           <div class="row">
             <input class="button-primary" type="submit" value="Save SVG" id="save"/>
-            <input class="button-primary" type="submit" value="Download JPG" id="download"/>
+            <!-- <input class="button-primary" type="submit" value="Download JPG" id="download"/> -->
           </div>
         </section>
       </div>
