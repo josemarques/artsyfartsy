@@ -3,7 +3,14 @@
 /* Declare all the global things */
 var maxArtboardPosX = 800;
 var maxArtboardPosY = 600;
-var paper, preferences, globalAngle, retina = 1;
+var maxStrokeWidth = 10;
+var paper, preferences, globalAngle, retina = 1, strokeWidth = 1;
+var shapeProperties = {};
+shapeProperties.strokeWidth = 0;
+shapeProperties.strokeOpacity = 1;
+shapeProperties.strokeColor = "";
+shapeProperties.fillOpacity = 1;
+shapeProperties.fillColor = "";
 
 $( document ).ready( function(){
 
@@ -42,7 +49,6 @@ $( document ).ready( function(){
 		updateCanvasDimention();
 	});
 
-
 });
 
 function getPreferences () {
@@ -64,10 +70,11 @@ function getPreferences () {
 	preferences.colorSet = $("#colorSet").val();
 	preferences.fillingtype = $("#fillingtype").val();
 	preferences.allowDistictColors = $("#allowDistict").val();
+	preferences.strokeWidth = $("#strokeWidth").val();
 
 	switch (preferences.objectSize) {
 		case "xl":
-			preferences.objectSize = 1;
+			preferences.objectSize = 0.75;
 			break;
 		case "l":
 			preferences.objectSize = 0.5;
@@ -92,6 +99,7 @@ function getPreferences () {
 	else{
 		preferences.allowedColors = generateColorArray ( preferences.numberColors );
 	}
+
 	return preferences;
 }
 
@@ -106,9 +114,8 @@ function drawBackground (){
 	var color = ( preferences.useBackgroundColor ? preferences.backgroundColor : getColor());
 	var background = paper.rect(0,0,preferences.maxWidth,preferences.maxHeight).attr({
 		fill: color,
-		'stroke-width': 0
+		'strokeWidth': 0
 	});
-
 }
 
 /*
@@ -123,16 +130,53 @@ function generateShapes( numberShapes ){
 
 	for (i = 1; i <= numberShapes; i++) {
 
-		//determine shape to generate
-		shapeType = preferences.allowedShapes[Math.floor(Math.random()*preferences.allowedShapes.length)];
-		if( shapeType == 'circle') drawCircle ();
-		else if( shapeType == 'triangle') drawTriangle ();
-		else if( shapeType == 'polygon') drawPolygon ();
-		else if( shapeType == 'line') drawLine ();
+		//set the shape properties
+		shapeProperties = setShapeProperties() ;
+
+		if( shapeProperties.shapeType == 'circle') drawCircle ();
+		else if( shapeProperties.shapeType == 'triangle') drawTriangle ();
+		else if( shapeProperties.shapeType == 'polygon') drawPolygon ();
+		else if( shapeProperties.shapeType == 'line') drawLine ();
 		else {
 			drawRectangle ();
 		}
 	}
+}
+
+function setShapeProperties () {
+	shapeProperties.fillColor = getColor();
+
+	shapeProperties.strokeOpacity = getRandomArbitrary(0.25, 1);
+	shapeProperties.fillOpacity = getRandomArbitrary(0.25, 1);
+
+	if (preferences.allowDistictColors)
+		shapeProperties.strokeColor = getColor();
+	else{
+		shapeProperties.strokeColor = shapeProperties.fillColor;
+	}
+
+	if(preferences.allowTransparency)
+		shapeProperties.fillOpacity = getRandomArbitrary(0.25, 1);
+
+	if ( preferences.strokeWidth == 'random' )
+		shapeProperties.strokeWidth = getRandomArbitrary(1, maxStrokeWidth);
+	else{
+		shapeProperties.strokeWidth = preferences.strokeWidth;
+	}
+
+	if(preferences.fillingtype == 'border'){
+		shapeProperties.fillOpacity = 0;
+	}
+	else if(preferences.fillingtype == 'filling'){
+		shapeProperties.strokeWidth = 0;
+	}
+
+	//determine shape to generate
+	shapeProperties.shapeType = preferences.allowedShapes[Math.floor(Math.random()*preferences.allowedShapes.length)];
+
+	console.log("shapeProperties.strokeWidth " + shapeProperties.strokeWidth);
+
+	return shapeProperties;
 }
 
 /**
@@ -162,42 +206,17 @@ function drawRectangle () {
 	var y= getRandomArbitrary(-0.5*maxArtboardPosY,maxArtboardPosY+10);
 	var width = getRandomArbitrary(0,preferences.maxWidth);
 	var height = getRandomArbitrary(0,preferences.maxHeight);
-	var angle = 0, radius = 0, stroke_width= 0, fill_opacity = 1, stroke_opacity = 1;
-	var fill_color, stroke_color;
-
-	fill_color = getColor();
-	stroke_color = getColor();
+	var angle = 0, radius = 0;
 
 	if(preferences.allowRoundCorners)
 		radius = getRandomArbitrary(0, ( width > height ? width : height ));
 
-	if(preferences.allowTransparency)
-		fill_opacity = getRandomArbitrary(0.25, 1);
-
-	if(preferences.fillingtype == 'random'){
-		stroke_opacity = getRandomArbitrary(0.25, 1);
-		stroke_width = getRandomArbitrary(1, 5);
-	}
-	else if(preferences.fillingtype == 'none'){
-		stroke_opacity = getRandomArbitrary(0.25, 1);
-		stroke_width = getRandomArbitrary(1, 5);
-		fill_opacity = 0;
-	}
-	else{
-		stroke_width = 0;
-		stroke_opacity = 0;
-	}
-
-	if ( !preferences.allowDistictColors ){
-			stroke_color = fill_color;
-	}
-
 	var rectangle = paper.rect(x,y,width,height).attr({
-		'stroke-width': stroke_width,
-		'stroke': stroke_color,
-		'stroke-opacity': stroke_opacity,
-		'fill': fill_color,
-		'fill-opacity': fill_opacity,
+		'stroke-width': shapeProperties.strokeWidth,
+		'stroke': shapeProperties.strokeColor,
+		'stroke-opacity': shapeProperties.strokeOpacity,
+		'fill': shapeProperties.fillColor,
+		'fill-opacity': shapeProperties.fillOpacity,
 		'radius': radius
 	});
 
@@ -219,39 +238,13 @@ function drawCircle () {
 	var x = getRandomArbitrary(0,maxArtboardPosX,true);
 	var y= getRandomArbitrary(0,maxArtboardPosY,true);
 	var radius = getRandomArbitrary(0,preferences.maxWidth);
-	var stroke_width= 0, fill_opacity = 1, stroke_opacity = 1;
-	var fill_color, stroke_color;
-
-	fill_color = getColor();
-	stroke_color = getColor();
-
-	if(preferences.allowTransparency)
-		fill_opacity = getRandomArbitrary(0.25, 1);
-
-	if(preferences.fillingtype == 'random'){
-		stroke_opacity = getRandomArbitrary(0.25, 1);
-		stroke_width = getRandomArbitrary(1, 5);
-	}
-	else if(preferences.fillingtype == 'none'){
-		stroke_opacity = getRandomArbitrary(0.25, 1);
-		stroke_width = getRandomArbitrary(1, 5);
-		fill_opacity = 0;
-	}
-	else{
-		stroke_width = 0;
-		stroke_opacity = 0;
-	}
-
-	if ( !preferences.allowDistictColors ){
-			stroke_color = fill_color;
-	}
 
 	var circle = paper.circle(x,y,radius).attr({
-		'stroke-width': stroke_width,
-		'stroke': stroke_color,
-		'stroke-opacity': stroke_opacity,
-		'fill': fill_color,
-		'fill-opacity': fill_opacity
+		'stroke-width': shapeProperties.strokeWidth,
+		'stroke': shapeProperties.strokeColor,
+		'stroke-opacity': shapeProperties.strokeOpacity,
+		'fill': shapeProperties.fillColor,
+		'fill-opacity': shapeProperties.fillOpacity
 	});
 
 	circle.transform("s" + preferences.objectSize);
@@ -260,11 +253,6 @@ function drawCircle () {
 function drawPolygon (verticesNumber) {
 
 	var x,y,point,polygonString;
-	var stroke_width= 0, fill_opacity = 1, stroke_opacity = 1;
-	var fill_color, stroke_color;
-
-	fill_color = getColor();
-	stroke_color = getColor();
 
 	if (verticesNumber == null)
 		verticesNumber = parseInt(getRandomArbitrary(3,5));
@@ -282,41 +270,18 @@ function drawPolygon (verticesNumber) {
 		x = getRandomArbitrary(-0.5*maxArtboardPosX,maxArtboardPosX*3,true);
 		y= getRandomArbitrary(-0.5*maxArtboardPosX,maxArtboardPosY*3,true);
 		point = parseInt(x) + "," + parseInt(y);
-
 		polygonString += " L " + point;
-
 	}
 
 	//add last point
 	polygonString += " L " + firstPoint;
 
-	if(preferences.allowTransparency)
-		fill_opacity = getRandomArbitrary(0.25, 1);
-
-	if(preferences.fillingtype == 'random'){
-		stroke_opacity = getRandomArbitrary(0.25, 1);
-		stroke_width = getRandomArbitrary(1, 1);
-	}
-	else if(preferences.fillingtype == 'none'){
-		stroke_opacity = getRandomArbitrary(0.25, 1);
-		stroke_width = getRandomArbitrary(1, 1);
-		fill_opacity = 0;
-	}
-	else{
-		stroke_width = 0;
-		stroke_opacity = 0;
-	}
-
-	if ( !preferences.allowDistictColors ){
-			stroke_color = fill_color;
-	}
-
 	var polygon = paper.path(polygonString).attr({
-		'stroke-width': stroke_width,
-		'stroke': stroke_color,
-		'stroke-opacity': stroke_opacity,
-		'fill': fill_color,
-		'fill-opacity': fill_opacity
+		'stroke-width': shapeProperties.strokeWidth,
+		'stroke': shapeProperties.strokeColor,
+		'stroke-opacity': shapeProperties.strokeOpacity,
+		'fill': shapeProperties.fillColor,
+		'fill-opacity': shapeProperties.fillOpacity
 	});
 
 	polygon.transform( "s" + preferences.objectSize/2 );
@@ -333,17 +298,16 @@ function drawTriangle() {
 	x2 = x1 + side;
 	triangleString ="M " + parseInt(x1) + "," + parseInt(y1) +
 						"L " + parseInt(x2) + "," + parseInt(y1) +
-						"L " + parseInt(x1 + side/2) + "," + parseInt(y1 + side/1.5);
+						"L " + parseInt(x1 + side/2) + "," + parseInt(y1 + side/1.5) +
+						"L " + parseInt(x1) + "," + parseInt(y1);
 
-	if(preferences.allowTransparency)
-		var opacity = getRandomArbitrary(0.25, 1);
-
-	console.log ("triangle: " + triangleString);
 
 	var polygon = paper.path(triangleString).attr({
-		fill: getColor(),
-		'stroke-width': 0,
-		'fill-opacity': opacity
+		'stroke-width': shapeProperties.strokeWidth,
+		'stroke': shapeProperties.strokeColor,
+		'stroke-opacity': shapeProperties.strokeOpacity,
+		'fill': shapeProperties.fillColor,
+		'fill-opacity': shapeProperties.fillOpacity
 	});
 
 	//always rotate unless persiste angle
@@ -396,12 +360,12 @@ function drawLine (){
 	if(preferences.allowTransparency)
 		var opacity = getRandomArbitrary(0.25, 1);
 
-	var stroke_width = getRandomArbitrary(1, 3);
+	var strokeWidth = getRandomArbitrary(1, 3);
 
 	var line = paper.path(lineString).attr({
-		'stroke': getColor(),
-		'stroke-width': stroke_width,
-		'fill-opacity': opacity
+		'stroke-width': shapeProperties.strokeWidth,
+		'stroke': shapeProperties.strokeColor,
+		'fill-opacity': shapeProperties.fillOpacity
 	});
 
 	if( preferences.allowRotation ){
@@ -416,9 +380,12 @@ function randomAllow (){
 
 function generateColorArray ( numberColors ) {
 	var colors = [];
+	var colorsString = "";
 	for (k = 0; k < numberColors; k++) {
 		colors[k] = getRandomColor ();
+		colorsString += " " + colors[k];
 	}
+	console.log ( "Colors used: " + colorsString);
 	return colors;
 }
 
