@@ -62,6 +62,8 @@ function getPreferences () {
 	preferences.backgroundColor = $("#backgroundColor").val();
 	preferences.useColorSet = $("#useColorSet").prop('checked');
 	preferences.colorSet = $("#colorSet").val();
+	preferences.fillingtype = $("#fillingtype").val();
+	preferences.allowDistictColors = $("#allowDistict").val();
 
 	switch (preferences.objectSize) {
 		case "xl":
@@ -160,18 +162,42 @@ function drawRectangle () {
 	var y= getRandomArbitrary(-0.5*maxArtboardPosY,maxArtboardPosY+10);
 	var width = getRandomArbitrary(0,preferences.maxWidth);
 	var height = getRandomArbitrary(0,preferences.maxHeight);
-	var angle = 0, radius = 0, opacity = 1;
+	var angle = 0, radius = 0, stroke_width= 0, fill_opacity = 1, stroke_opacity = 1;
+	var fill_color, stroke_color;
+
+	fill_color = getColor();
+	stroke_color = getColor();
 
 	if(preferences.allowRoundCorners)
 		radius = getRandomArbitrary(0, ( width > height ? width : height ));
 
 	if(preferences.allowTransparency)
-		opacity = getRandomArbitrary(0.25, 1);
+		fill_opacity = getRandomArbitrary(0.25, 1);
+
+	if(preferences.fillingtype == 'random'){
+		stroke_opacity = getRandomArbitrary(0.25, 1);
+		stroke_width = getRandomArbitrary(1, 5);
+	}
+	else if(preferences.fillingtype == 'none'){
+		stroke_opacity = getRandomArbitrary(0.25, 1);
+		stroke_width = getRandomArbitrary(1, 5);
+		fill_opacity = 0;
+	}
+	else{
+		stroke_width = 0;
+		stroke_opacity = 0;
+	}
+
+	if ( !preferences.allowDistictColors ){
+			stroke_color = fill_color;
+	}
 
 	var rectangle = paper.rect(x,y,width,height).attr({
-		fill: getColor(),
-		'stroke-width': 0,
-		'fill-opacity': opacity,
+		'stroke-width': stroke_width,
+		'stroke': stroke_color,
+		'stroke-opacity': stroke_opacity,
+		'fill': fill_color,
+		'fill-opacity': fill_opacity,
 		'radius': radius
 	});
 
@@ -193,14 +219,39 @@ function drawCircle () {
 	var x = getRandomArbitrary(0,maxArtboardPosX,true);
 	var y= getRandomArbitrary(0,maxArtboardPosY,true);
 	var radius = getRandomArbitrary(0,preferences.maxWidth);
+	var stroke_width= 0, fill_opacity = 1, stroke_opacity = 1;
+	var fill_color, stroke_color;
+
+	fill_color = getColor();
+	stroke_color = getColor();
 
 	if(preferences.allowTransparency)
-		opacity = getRandomArbitrary(0.25, 1);
+		fill_opacity = getRandomArbitrary(0.25, 1);
+
+	if(preferences.fillingtype == 'random'){
+		stroke_opacity = getRandomArbitrary(0.25, 1);
+		stroke_width = getRandomArbitrary(1, 5);
+	}
+	else if(preferences.fillingtype == 'none'){
+		stroke_opacity = getRandomArbitrary(0.25, 1);
+		stroke_width = getRandomArbitrary(1, 5);
+		fill_opacity = 0;
+	}
+	else{
+		stroke_width = 0;
+		stroke_opacity = 0;
+	}
+
+	if ( !preferences.allowDistictColors ){
+			stroke_color = fill_color;
+	}
 
 	var circle = paper.circle(x,y,radius).attr({
-		fill: getColor(),
-		'stroke-width': 0,
-		'fill-opacity': opacity
+		'stroke-width': stroke_width,
+		'stroke': stroke_color,
+		'stroke-opacity': stroke_opacity,
+		'fill': fill_color,
+		'fill-opacity': fill_opacity
 	});
 
 	circle.transform("s" + preferences.objectSize);
@@ -209,31 +260,63 @@ function drawCircle () {
 function drawPolygon (verticesNumber) {
 
 	var x,y,point,polygonString;
-	var opacity = 1;
+	var stroke_width= 0, fill_opacity = 1, stroke_opacity = 1;
+	var fill_color, stroke_color;
+
+	fill_color = getColor();
+	stroke_color = getColor();
 
 	if (verticesNumber == null)
-		verticesNumber = parseInt(getRandomArbitrary(3,9));
+		verticesNumber = parseInt(getRandomArbitrary(3,5));
+
+
+	//define first and last point
+
+	x1 = getRandomArbitrary(-0.5*maxArtboardPosX,maxArtboardPosX*3,true);
+	y1= getRandomArbitrary(-0.5*maxArtboardPosX,maxArtboardPosY*3,true);
+	firstPoint = parseInt(x1) + "," + parseInt(y1);
+
+	polygonString = "M " + firstPoint;
 
 	for (j = 0; j < verticesNumber; j++) {
 		x = getRandomArbitrary(-0.5*maxArtboardPosX,maxArtboardPosX*3,true);
 		y= getRandomArbitrary(-0.5*maxArtboardPosX,maxArtboardPosY*3,true);
 		point = parseInt(x) + "," + parseInt(y);
 
-		if(polygonString != null)
-				polygonString += " L " + point;
+		polygonString += " L " + point;
 
-		else{
-			polygonString = "M " + point;
-		}
 	}
 
+	//add last point
+	polygonString += " L " + firstPoint;
+
 	if(preferences.allowTransparency)
-		var opacity = getRandomArbitrary(0.25, 1);
+		fill_opacity = getRandomArbitrary(0.25, 1);
+
+	if(preferences.fillingtype == 'random'){
+		stroke_opacity = getRandomArbitrary(0.25, 1);
+		stroke_width = getRandomArbitrary(1, 1);
+	}
+	else if(preferences.fillingtype == 'none'){
+		stroke_opacity = getRandomArbitrary(0.25, 1);
+		stroke_width = getRandomArbitrary(1, 1);
+		fill_opacity = 0;
+	}
+	else{
+		stroke_width = 0;
+		stroke_opacity = 0;
+	}
+
+	if ( !preferences.allowDistictColors ){
+			stroke_color = fill_color;
+	}
 
 	var polygon = paper.path(polygonString).attr({
-		fill: getColor(),
-		'stroke-width': 0,
-		'fill-opacity': opacity
+		'stroke-width': stroke_width,
+		'stroke': stroke_color,
+		'stroke-opacity': stroke_opacity,
+		'fill': fill_color,
+		'fill-opacity': fill_opacity
 	});
 
 	polygon.transform( "s" + preferences.objectSize/2 );
