@@ -867,9 +867,11 @@ h4 {
   border: 1px solid rgba(0, 0, 0, 0.05); }
 
 .controls {
+  overflow-y: scroll;
   position: fixed;
   top: 10px;
   right: 10px;
+  bottom: 10px;
   width: 400px;
   padding: 10px;
   background-color: rgba(255, 255, 255, 0.95);

@@ -18,9 +18,11 @@ h4{
 }
 
 .controls{
+  overflow-y: scroll;
   position: fixed;
-  top: 10px;
-  right: 10px;
+    top: 10px;
+    right: 10px;
+    bottom: 10px;
   width: 400px;
   padding: 10px;
   background-color: rgba(255,255,255,0.95);
